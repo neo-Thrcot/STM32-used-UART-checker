@@ -57,6 +57,16 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define leftup_sw_Pin GPIO_PIN_5
+#define leftup_sw_GPIO_Port GPIOA
+#define leftdown_sw_Pin GPIO_PIN_6
+#define leftdown_sw_GPIO_Port GPIOA
+#define decide_sw_Pin GPIO_PIN_7
+#define decide_sw_GPIO_Port GPIOA
+#define rightdown_sw_Pin GPIO_PIN_0
+#define rightdown_sw_GPIO_Port GPIOB
+#define rightup_sw_Pin GPIO_PIN_1
+#define rightup_sw_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
