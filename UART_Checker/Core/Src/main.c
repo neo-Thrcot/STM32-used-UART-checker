@@ -57,7 +57,14 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+uint32_t baudrate = 115200;
+uint32_t baudrate_select[10] = {1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800};
 
+uint8_t receive_num = 1;
+uint8_t receive_buf[32] = {0};
+
+uint8_t transmit_num = 1;
+uint8_t transmi_buf[32] = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -136,7 +143,7 @@ int main(void)
 
 		  switch (config) {
 			case SETTING:
-
+				UART_Setting();
 				break;
 
 			case RECEIVE_TEST:
@@ -332,7 +339,113 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void UART_Setting(void)
+{
+	UART_Setting_t setting = BAUDRATE;
 
+	while (1) {
+		OLED_DataClear();
+		OLED_Char_Print("Select the setting", 0, 0);
+		OLED_Char_Print(" Baud Rate", 0, 8);
+		OLED_Char_Print(" Receive", 0, 16);
+		OLED_Char_Print(" Transmit", 0, 24);
+		OLED_Char_Print(" SerialMonitor", 0, 32);
+		OLED_Char_Print(">", 0, setting * 8 + 8);
+		OLED_Display(&hi2c1);
+
+		if (HAL_GPIO_ReadPin(rightup_sw_GPIO_Port, rightup_sw_Pin) == 1 && HAL_GPIO_ReadPin(rightdown_sw_GPIO_Port, rightdown_sw_Pin) == 1) {
+			break;
+		}
+
+		if (HAL_GPIO_ReadPin(decide_sw_GPIO_Port, decide_sw_Pin) == 1) {
+			while (HAL_GPIO_ReadPin(decide_sw_GPIO_Port, decide_sw_Pin) == 1);
+
+			switch (setting) {
+				case BAUDRATE:
+					int select_i = 0;
+					int rate_i = 0;
+
+					while (1) {
+						OLED_DataClear();
+						OLED_Char_Print("Now BaudRate:", 0, 0);
+						OLED_Int_Print(baudrate, 78, 0);
+						OLED_Char_Print(" BaudRate:", 0, 8);
+						OLED_Int_Print(baudrate_select[rate_i], 60, 8);
+						OLED_Char_Print(" Change BaudRate", 0, 16);
+						OLED_Char_Print(">", 0, select_i * 8 + 8);
+						OLED_Display(&hi2c1);
+
+						if (HAL_GPIO_ReadPin(rightup_sw_GPIO_Port, rightup_sw_Pin) == 1 && HAL_GPIO_ReadPin(rightdown_sw_GPIO_Port, rightdown_sw_Pin) == 1) {
+							break;
+						}
+
+						if (HAL_GPIO_ReadPin(rightup_sw_GPIO_Port, rightup_sw_Pin) == 1 && select_i == 0) {
+							while (HAL_GPIO_ReadPin(rightup_sw_GPIO_Port, rightup_sw_Pin) == 1);
+							rate_i = (rate_i == 9) ? 9 : rate_i + 1;
+						}
+
+						if (HAL_GPIO_ReadPin(rightdown_sw_GPIO_Port, rightdown_sw_Pin) == 1 && select_i == 0) {
+							while (HAL_GPIO_ReadPin(rightdown_sw_GPIO_Port, rightdown_sw_Pin) == 1);
+							rate_i = (rate_i == 0) ? 0 : rate_i - 1;
+						}
+
+						if (HAL_GPIO_ReadPin(decide_sw_GPIO_Port, decide_sw_Pin) == 1 && select_i == 1) {
+							while (HAL_GPIO_ReadPin(decide_sw_GPIO_Port, decide_sw_Pin) == 1);
+
+							baudrate = baudrate_select[rate_i];
+
+							HAL_UART_DeInit(&huart2);
+							huart2.Init.BaudRate = baudrate;
+
+							if (HAL_UART_Init(&huart2) != HAL_OK) {
+								Error_Handler();
+							}
+
+							break;
+						}
+
+						if (HAL_GPIO_ReadPin(leftup_sw_GPIO_Port, leftup_sw_Pin) == 1) {
+							while (HAL_GPIO_ReadPin(leftup_sw_GPIO_Port, leftup_sw_Pin) == 1);
+							select_i = (select_i == 0) ? 1 : 0;
+						}
+
+						if (HAL_GPIO_ReadPin(leftdown_sw_GPIO_Port, leftdown_sw_Pin) == 1) {
+							while (HAL_GPIO_ReadPin(leftdown_sw_GPIO_Port, leftdown_sw_Pin) == 1);
+							select_i = (select_i == 1) ? 0 : 1;
+						}
+					}
+
+					while (HAL_GPIO_ReadPin(rightup_sw_GPIO_Port, rightup_sw_Pin) == 1 || HAL_GPIO_ReadPin(rightdown_sw_GPIO_Port, rightdown_sw_Pin) == 1);
+
+					break;
+
+				case RECEIVE:
+
+					break;
+
+				case TRANSMIT:
+
+					break;
+
+				case MONITOR:
+
+					break;
+			}
+		}
+
+		if (HAL_GPIO_ReadPin(leftup_sw_GPIO_Port, leftup_sw_Pin) == 1) {
+			while (HAL_GPIO_ReadPin(leftup_sw_GPIO_Port, leftup_sw_Pin) == 1);
+			setting = (setting == BAUDRATE) ? MONITOR : setting - 1;
+		}
+
+		if (HAL_GPIO_ReadPin(leftdown_sw_GPIO_Port, leftdown_sw_Pin) == 1) {
+			while (HAL_GPIO_ReadPin(leftdown_sw_GPIO_Port, leftdown_sw_Pin) == 1);
+			setting = (setting == MONITOR) ? BAUDRATE : setting + 1;
+		}
+	}
+
+	while (HAL_GPIO_ReadPin(rightup_sw_GPIO_Port, rightup_sw_Pin) == 1 || HAL_GPIO_ReadPin(rightdown_sw_GPIO_Port, rightdown_sw_Pin) == 1);
+}
 /* USER CODE END 4 */
 
 /**

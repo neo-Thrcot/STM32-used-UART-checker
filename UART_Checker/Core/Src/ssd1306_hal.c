@@ -960,5 +960,10 @@ void OLED_Hex_Print(uint8_t val, int x, int y)
 	sprintf(Change_Char, "%x", val);
 
 	OLED_Char_Print("0x", x, y);
-	OLED_Char_Print(Change_Char, x + 12, y);
+	if (val < 16) {
+		OLED_Char_Print("0", x + 12, y);
+		OLED_Char_Print(Change_Char, x + 18, y);
+	} else {
+		OLED_Char_Print(Change_Char, x + 12, y);
+	}
 }
