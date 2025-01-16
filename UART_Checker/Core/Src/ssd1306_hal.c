@@ -937,7 +937,7 @@ void OLED_Char_Print(char *message, int x, int y)
 
 void OLED_Int_Print(int val, int x, int y)
 {
-	char Change_Char[255] = {0};
+	char Change_Char[32] = {0};
 
 	sprintf(Change_Char, "%d", val);
 
@@ -946,9 +946,19 @@ void OLED_Int_Print(int val, int x, int y)
 
 void OLED_Double_Print(double val, int x, int y)
 {
-	char Change_Char[255] = {0};
+	char Change_Char[32] = {0};
 
 	sprintf(Change_Char, "%.6f", val);
 
 	OLED_Char_Print(Change_Char, x, y);
+}
+
+void OLED_Hex_Print(uint8_t val, int x, int y)
+{
+	char Change_Char[10] = {0};
+
+	sprintf(Change_Char, "%x", val);
+
+	OLED_Char_Print("0x", x, y);
+	OLED_Char_Print(Change_Char, x + 12, y);
 }

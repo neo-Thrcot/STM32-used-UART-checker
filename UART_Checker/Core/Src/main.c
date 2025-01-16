@@ -66,7 +66,10 @@ static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+void UART_Setting(void);
+void Receive_Test(void);
+void Transmit_Test(void);
+void Monitor_Mode(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -117,6 +120,48 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  static UART_Config_t config = SETTING;
+
+	  OLED_DataClear();
+	  OLED_Char_Print("Select to do.", 0, 0);
+	  OLED_Char_Print(" Settings", 0, 8);
+	  OLED_Char_Print(" Receive test", 0, 16);
+	  OLED_Char_Print(" Transmit test", 0, 24);
+	  OLED_Char_Print(" SerialMonitor", 0, 32);
+	  OLED_Char_Print(">", 0, config * 8 + 8);
+	  OLED_Display(&hi2c1);
+
+	  if (HAL_GPIO_ReadPin(decide_sw_GPIO_Port, decide_sw_Pin) == 1) {
+		  while (HAL_GPIO_ReadPin(decide_sw_GPIO_Port, decide_sw_Pin) == 1);
+
+		  switch (config) {
+			case SETTING:
+
+				break;
+
+			case RECEIVE_TEST:
+
+				break;
+
+			case TRANSMIT_TEST:
+
+				break;
+
+			case MONITOR_MODE:
+
+				break;
+		}
+	  }
+
+	  if (HAL_GPIO_ReadPin(leftup_sw_GPIO_Port, leftup_sw_Pin) == 1) {
+		  while (HAL_GPIO_ReadPin(leftup_sw_GPIO_Port, leftup_sw_Pin) == 1);
+		  config = (config == SETTING) ? MONITOR_MODE : config - 1;
+	  }
+
+	  if (HAL_GPIO_ReadPin(leftdown_sw_GPIO_Port, leftdown_sw_Pin) == 1) {
+		  while (HAL_GPIO_ReadPin(leftdown_sw_GPIO_Port, leftdown_sw_Pin) == 1);
+		  config = (config == MONITOR_MODE) ? SETTING : config + 1;
+	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
